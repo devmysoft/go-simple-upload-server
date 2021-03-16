@@ -17,6 +17,4 @@ RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /go/bin/app
 FROM alpine:3.11 AS runtime-env
 COPY --from=build-env /go/bin/app /usr/local/bin/app
 
-EXPOSE 443/tcp
-
 ENTRYPOINT ["/usr/local/bin/app"]
