@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -132,14 +133,14 @@ func (s Server) handlePost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s Server) handlePut(w http.ResponseWriter, r *http.Request) {
-	matches := rePathFiles.FindStringSubmatch(r.URL.Path)
-	if matches == nil {
-		logger.WithField("path", r.URL.Path).Info("invalid path")
-		w.WriteHeader(http.StatusNotFound)
-		writeError(w, fmt.Errorf("\"%s\" is not found", r.URL.Path))
-		return
-	}
-	targetPath := path.Join(s.DocumentRoot, matches[1])
+	//matches := rePathFiles.FindStringSubmatch(r.URL.Path)
+	//if matches == nil {
+	//	logger.WithField("path", r.URL.Path).Info("invalid path")
+	//	w.WriteHeader(http.StatusNotFound)
+	//	writeError(w, fmt.Errorf("\"%s\" is not found", r.URL.Path))
+	//	return
+	//}
+	targetPath := path.Join(s.DocumentRoot, r.URL.Path)//matches[1])
 
 	// We have to create a new temporary file in the same device to avoid "invalid cross-device link" on renaming.
 	// Here is the easiest solution: create it in the same directory.
@@ -190,6 +191,7 @@ func (s Server) handlePut(w http.ResponseWriter, r *http.Request) {
 	// operation if on linux or other unix-like OS (windows hosts should look into https://github.com/natefinch/atomic
 	// package for atomic file write operations)
 	tempFile.Close()
+	os.MkdirAll(filepath.Dir(targetPath), os.FileMode(0766));
 	if err := os.Rename(tempFile.Name(), targetPath); err != nil {
 		os.Remove(tempFile.Name())
 		logger.WithError(err).WithField("path", targetPath).Error("failed to rename temp file to final filename for upload")
