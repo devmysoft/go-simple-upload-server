@@ -18,11 +18,3 @@ FROM alpine:3.11 AS runtime-env
 COPY --from=build-env /go/bin/app /usr/local/bin/app
 
 ENTRYPOINT ["/usr/local/bin/app"]
-
-ARG USER_ID
-ARG GROUP_ID
-
-RUN addgroup -g $GROUP_ID user
-RUN adduser -D -u $USER_ID -G user user
-
-USER user
