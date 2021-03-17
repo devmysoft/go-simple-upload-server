@@ -176,7 +176,7 @@ func (s Server) handlePut(w http.ResponseWriter, r *http.Request) {
 			"size": size,
 		}).Info("file size exceeded")
 		w.WriteHeader(http.StatusRequestEntityTooLarge)
-		writeError(w, errors.New("uploaded file size exceeds the limit. Upload file: "+ strconv.FormatInt(size, 10)+"B Limite size : "+strconv.FormatInt(s.MaxUploadSize, 10)+"B"))
+		writeError(w, errors.New("uploaded file size exceeds the limit. Upload file: "+ strconv.FormatInt(size, 10)+"o Limite size : "+strconv.FormatInt(s.MaxUploadSize, 10)+"o"))
 		return
 	}
 
