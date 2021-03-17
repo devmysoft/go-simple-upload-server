@@ -18,7 +18,7 @@ import (
 
 var (
 	rePathUpload = regexp.MustCompile(`^/upload$`)
-	rePathFiles  = regexp.MustCompile(`^/files/([^/]+)$`)
+	rePathFiles  = regexp.MustCompile(`^/files/(.*)$`)
 
 	errTokenMismatch = errors.New("token mismatched")
 	errMissingToken  = errors.New("missing token")
@@ -133,14 +133,14 @@ func (s Server) handlePost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s Server) handlePut(w http.ResponseWriter, r *http.Request) {
-	//matches := rePathFiles.FindStringSubmatch(r.URL.Path)
-	//if matches == nil {
-	//	logger.WithField("path", r.URL.Path).Info("invalid path")
-	//	w.WriteHeader(http.StatusNotFound)
-	//	writeError(w, fmt.Errorf("\"%s\" is not found", r.URL.Path))
-	//	return
-	//}
-	targetPath := path.Join(s.DocumentRoot, r.URL.Path)//matches[1])
+	matches := rePathFiles.FindStringSubmatch(r.URL.Path)
+	if matches == nil {
+		logger.WithField("path", r.URL.Path).Info("invalid path")
+		w.WriteHeader(http.StatusNotFound)
+		writeError(w, fmt.Errorf("\"%s\" is not found", r.URL.Path))
+		return
+	}
+	targetPath := path.Join(s.DocumentRoot, matches[1])
 
 	// We have to create a new temporary file in the same device to avoid "invalid cross-device link" on renaming.
 	// Here is the easiest solution: create it in the same directory.
