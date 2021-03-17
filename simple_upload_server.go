@@ -61,6 +61,9 @@ func run(args []string) int {
 			"upload_limit": *maxUploadSize,
 			"root":         serverRoot,
 			"cors":         *corsEnabled,
+			"ALERT_SMTP_HOST": os.Getenv("ALERT_SMTP_HOST"),
+            "ALERT_SMTP_EMAIL_FROM": os.Getenv("ALERT_SMTP_EMAIL_FROM"),
+            "ALERT_SMTP_EMAIL_TO": os.Getenv("ALERT_SMTP_EMAIL_TO"),
 		}).Info("start listening")
 
 		if err := http.ListenAndServe(fmt.Sprintf("%s:%d", *bindAddress, *listenPort), nil); err != nil {
