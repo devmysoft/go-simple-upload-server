@@ -34,11 +34,13 @@ func newErrorResponse(err error) errorResponse {
 func writeError(w http.ResponseWriter, err error) (int, error) {
 	body := newErrorResponse(err)
 	b, e := json.Marshal(body)
-	sendEmail(err.Error())
+
 	// if an error is occured on marshaling, write empty value as response.
 	if e != nil {
+	    sendEmail(os.Getenv("ALERT_SMTP_OBJECT") + " ERROR marshaling", err.Error())
 		return w.Write([]byte{})
 	}
+	sendEmail(os.Getenv("ALERT_SMTP_OBJECT") + " ERROR", err.Error())
 	return w.Write(b)
 }
 
@@ -47,8 +49,15 @@ func writeSuccess(w http.ResponseWriter, path string) (int, error) {
 	b, e := json.Marshal(body)
 	// if an error is occured on marshaling, write empty value as response.
 	if e != nil {
+	    if os.Getenv("SEND_SUCCESS_MAIL") == true {
+            sendEmail(os.Getenv("ALERT_SMTP_OBJECT") + " SUCCESS ERROR marshaling", path)
+        }
 		return w.Write([]byte{})
 	}
+	if os.Getenv("SEND_SUCCESS_MAIL") == true {
+	    sendEmail(os.Getenv("ALERT_SMTP_OBJECT") + " SUCCESS", path)
+	}
+
 	return w.Write(b)
 }
 
@@ -64,7 +73,7 @@ func getSize(content io.Seeker) (int64, error) {
 	return size, nil
 }
 
-func sendEmail(message string) {
+func sendEmail(object string, message string) {
     m := gomail.NewMessage()
 
     // Set E-Mail sender
@@ -74,7 +83,7 @@ func sendEmail(message string) {
     m.SetHeader("To", os.Getenv("ALERT_SMTP_EMAIL_TO"))
 
     // Set E-Mail subject
-    m.SetHeader("Subject", os.Getenv("ALERT_SMTP_OBJECT"))
+    m.SetHeader("Subject", object)
 
     // Set E-Mail body. You can set plain text or html with text/html
     m.SetBody("text/plain", message)
