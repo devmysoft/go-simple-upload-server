@@ -49,12 +49,12 @@ func writeSuccess(w http.ResponseWriter, path string) (int, error) {
 	b, e := json.Marshal(body)
 	// if an error is occured on marshaling, write empty value as response.
 	if e != nil {
-	    if os.Getenv("ALERT_SMTP_SEND_SUCCESS") == true {
+	    if os.Getenv("ALERT_SMTP_SEND_SUCCESS") == "true" {
             sendEmail(os.Getenv("ALERT_SMTP_OBJECT") + " SUCCESS ERROR marshaling", path)
         }
 		return w.Write([]byte{})
 	}
-	if os.Getenv("ALERT_SMTP_SEND_SUCCESS") == true {
+	if os.Getenv("ALERT_SMTP_SEND_SUCCESS") == "true" {
 	    sendEmail(os.Getenv("ALERT_SMTP_OBJECT") + " SUCCESS", path)
 	}
 
